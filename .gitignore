@@ -1,0 +1,10 @@
+node_modules/
+dist/
+server/uploads/*
+!server/uploads/.gitkeep
+.env
+deploy.env
+.deploy-atlas-uri
+.DS_Store
+npm-debug.log*
+*.log

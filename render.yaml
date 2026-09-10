@@ -1,0 +1,24 @@
+# Render blueprint config for the Hospital Management System
+#
+# Setup:
+#  1. Create a free MongoDB Atlas cluster (M0) and get your connection string.
+#  2. In Render, create a Blueprint from this repo (New > Blueprint).
+#  3. Provide the below environment variables.
+services:
+  - type: web
+    name: hms
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URI
+        sync: false
+        # set in Render dashboard  e.g. mongodb+srv://user:pass@cluster.mongodb.net/hospital_management
+      - key: JWT_SECRET
+        sync: false
+        # set in Render dashboard - any long random string
+      - key: CLIENT_URL
+        sync: false
+        # set to https://your-app.onrender.com (comma separated if multiple)

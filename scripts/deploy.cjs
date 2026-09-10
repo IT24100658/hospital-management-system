@@ -54,13 +54,26 @@ async function ensureGitHubRepo() {
 
 async function setupAtlas() {
   log('  - Looking for an existing Atlas project...');
-  const groups = await atlasJson('/groups?pageNum=1&itemsPerPage=100');
   let groupId = process.env.ATLAS_GROUP_ID;
   if (!groupId) {
-    if (!groups.results || groups.results.length === 0) {
-      throw new Error('No Atlas project found. Create one at https://cloud.mongodb.com -> Projects -> New Project, then re-run.');
+    try {
+      const groups = await atlasJson('/groups?pageNum=1&itemsPerPage=100');
+      groupId = groups.results && groups.results.length ? groups.results[0].id : null;
+    } catch (e) {
+      log('    listing projects failed: ' + e.message);
     }
-    groupId = groups.results[0].id;
+  }
+  if (!groupId) {
+    throw new Error(
+      'Could not read your Atlas projects with this API key.\n' +
+      'Fix one of these, then run `sh scripts/deploy.sh` again (it will resume):\n' +
+      '  A) Give the API key an ORGANIZATION role too:\n' +
+      '     cloud.mongodb.com -> hamburger menu -> Access Manager -> API Keys -> edit your key\n' +
+      '     -> in "Change Organization" / org roles, select "Organization Owner".\n' +
+      '  B) Or skip listing: copy your Project ID from the site URL\n' +
+      '     (looks like: https://cloud.mongodb.com/v2/5f1a2b3c4d5e6f7890a1b2c3#/...) and add to deploy.env:\n' +
+      '     ATLAS_GROUP_ID=5f1a2b3c4d5e6f7890a1b2c3'
+    );
   }
   log(`    using project ${groupId}`);
 

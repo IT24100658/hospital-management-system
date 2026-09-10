@@ -45,9 +45,15 @@ git -c commit.gpgsign=false commit -m "Hospital Management System" --no-verify >
 git push -u origin HEAD:main --force --quiet || git push -u origin HEAD:master --force --quiet
 echo "    Code pushed"
 
-echo "==> 2/3 Creating MongoDB Atlas cluster + database user"
-export GITHUB_REPO_URL="$REPO_URL"
-node scripts/deploy.cjs setup-atlas "$@"
+echo "==> 2/3 Database setup"
+if [ -n "${MONGO_URI:-}" ]; then
+  printf '%s' "$MONGO_URI" > .deploy-atlas-uri
+  echo "    Using the MONGO_URI from deploy.env (Atlas API not needed)"
+else
+  echo "    Creating MongoDB Atlas cluster + database user"
+  export GITHUB_REPO_URL="$REPO_URL"
+  node scripts/deploy.cjs setup-atlas "$@"
+fi
 
 echo "==> 3/3 Creating Render web service and waiting for it to go live"
 node scripts/deploy.cjs setup-render "$@"

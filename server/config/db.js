@@ -3,7 +3,7 @@ const config = require('./index');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(config.mongoUri);
+    const conn = await mongoose.connect(config.mongoUri, { tlsAllowInvalidCertificates: true });
     console.log(`MongoDB connected: ${conn.connection.host}`);
     return conn;
   } catch (err) {
